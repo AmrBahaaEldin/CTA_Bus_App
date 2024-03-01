@@ -2,8 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:grade_project/layout/Home_Screen/home_screen.dart';
-import 'package:grade_project/modules/Login_Screen/login_screen.dart';
+
 import 'package:grade_project/shared/components/components.dart';
+
+import '../Login_Screen/login_screen.dart';
 
 class ScanScreen extends StatelessWidget {
   const ScanScreen({super.key});

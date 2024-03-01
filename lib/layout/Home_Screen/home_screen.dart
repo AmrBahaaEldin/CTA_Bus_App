@@ -7,7 +7,8 @@ import 'package:grade_project/shared/cubit/state.dart';
 
 
 
-import '../../modules/Login_Screen/login_screen.dart';
+
+import '../../Views/Login_Screen/login_screen.dart';
 import '../../shared/styles/Nav_item.dart';
 
 

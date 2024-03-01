@@ -16,8 +16,9 @@ import 'package:grade_project/shared/cubit/state.dart';
 import 'package:grade_project/shared/network/local/cache_helper.dart';
 import 'package:grade_project/shared/styles/themes.dart';
 
-import 'modules/Driver detector/driverDetector_screen.dart';
-import 'modules/Login_Screen/login_screen.dart';
+
+
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();//app not work before execute methods above runApp

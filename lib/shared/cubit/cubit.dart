@@ -5,14 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 
-import 'package:grade_project/modules/Search/Search_Screen.dart';
-import 'package:grade_project/modules/Setting/setting_screen.dart';
-import 'package:grade_project/modules/Table/table_screen.dart';
+
 import 'package:grade_project/shared/cubit/state.dart';
 import 'package:grade_project/shared/network/local/cache_helper.dart';
 
+import '../../Views/Search/Search_Screen.dart';
+import '../../Views/Setting/setting_screen.dart';
+import '../../Views/TourStation/tour_station_view.dart';
 
-import '../../modules/Map/map_screen.dart';
+
+
+
 class AppCubit extends Cubit<AppStates>
 {
 
@@ -49,9 +52,9 @@ class AppCubit extends Cubit<AppStates>
   //////toggle between page Home_Screen_body/////
 
   List<Widget>homeScreen=[
-    const MapScreen(),
+    // const MapScreen(),
      SearchScreen(),
-     GuidanceScreen(),
+     TourStationView(),
     const SettingScreen(),
   ];
   int currentHomeIndex=1;
