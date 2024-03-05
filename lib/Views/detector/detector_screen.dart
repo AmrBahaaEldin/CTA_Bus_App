@@ -55,7 +55,7 @@ class DriverDetectorScreen  extends StatelessWidget {
                           Column(
                             children: [
                               IconButton(onPressed: () {
-                                navigateStop(context, const HomeScreen());
+                                navigateStop(context,  HomeScreen());
                               },
                                   icon: const Icon(Icons.home)),
                               const Text("صفحة رئيسية")
