@@ -12,51 +12,64 @@ class BrightNag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GNav(
-      backgroundColor:const Color(0xffF6F6F6),
-      iconSize: 25,
-      activeColor: const Color(0xff315D9D),
-      color: const Color(0xffA6A6A6),
-      tabBackgroundColor: Colors.grey,
-      padding: const EdgeInsets.all(16),
-      selectedIndex:AppCubit.get(context).currentHomeIndex,
-      gap: 8,
-      onTabChange: (index) {
-        AppCubit.get(context).toggleHomePage(index);
-      },
-
-      tabs: const [
-
-        GButton(
-          icon: MyFlutterApp.google_maps,
-          gap: 8,
-          text: "خريطة",
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+// Blue line above the navigation bar
 
 
+      children: [
+        Container(
+          width: double.infinity,
+          height: 2.0, // Adjust the height as needed
+          color: const Color(0xFF0057FF), // Blue color
         ),
-        GButton(
-          icon:Icons.search,
+        GNav(
+          backgroundColor:Colors.white,
+          iconSize: 25,
+         activeColor: Colors.white,
+          color: const Color(0xFF0057FF),
+          tabBackgroundColor: const Color(0xFF4071F4),
+          padding: const EdgeInsets.all(16),
+          selectedIndex:AppCubit.get(context).currentHomeIndex,
           gap: 8,
-          text: "بحث",
+          onTabChange: (index) {
+            AppCubit.get(context).toggleHomePage(index);
+          },
+
+          tabs: const [
+
+            GButton(
+              icon: MyCustomIconApp.google_maps,
+              gap: 8,
+              text: "خريطة",
 
 
+            ),
+            GButton(
+              icon:Icons.search,
+              gap: 8,
+              text: "بحث",
+
+
+            ),
+            GButton(
+              icon:Icons.book_outlined,
+              gap: 8,
+              text: "دليل",
+
+
+            ),
+            GButton(
+              icon:Icons.settings,
+              gap: 8,
+              text: "اعدادات ",
+
+
+            ),
+
+
+          ],
         ),
-        GButton(
-          icon:Icons.book_outlined,
-          gap: 8,
-          text: "دليل",
-
-
-        ),
-        GButton(
-          icon:Icons.settings,
-          gap: 8,
-          text: "اعدادات ",
-
-
-        ),
-
-
       ],
     );
   }
@@ -82,7 +95,7 @@ class DrakNag extends StatelessWidget {
       tabs: const [
 
         GButton(
-          icon: MyFlutterApp.google_maps,
+          icon: MyCustomIconApp.google_maps,
           gap: 8,
           text: "خريطة",
 

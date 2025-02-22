@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grade_project/shared/components/components.dart';
 import 'package:grade_project/shared/cubit/cubit.dart';
 import 'package:grade_project/shared/cubit/state.dart';
+import 'package:grade_project/shared/styles/log_app.dart';
 
 
 
@@ -15,8 +16,8 @@ import '../../shared/styles/Nav_item.dart';
 
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
+   HomeScreen({super.key});
+IconApp iconApp=IconApp();
   @override
   Widget build(BuildContext context) {
 
@@ -25,13 +26,20 @@ class HomeScreen extends StatelessWidget {
         AppCubit cubit= AppCubit.get(context);
         return Scaffold(
           appBar: AppBar(
-            leading:IconButton(icon: const Image(image: AssetImage("asset/image/bus_log_app.png")),
+            leading:IconButton(icon:  Image(image: iconApp.homeIconImage(),width:40),
               onPressed: () {
-              navigateTo(context, LoginScreen());
+              navigateTo(context, const LoginScreen());
             },
             ),
-            title: const Center(child: Text("CTA bus service",),
+            title:const Center(
+              child: Text("CTA bus service",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20
+                ),),
             ),
+
             actions:  const [
 
             ],
@@ -54,4 +62,6 @@ class HomeScreen extends StatelessWidget {
 
     );
   }
+
+
 }

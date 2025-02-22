@@ -9,9 +9,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grade_project/shared/cubit/state.dart';
 import 'package:grade_project/shared/network/local/cache_helper.dart';
 
-import '../../Views/Search/Search_Screen.dart';
+
+
+
+
+import '../../Views/Map/UserMap/user_map.dart';
 import '../../Views/Setting/setting_screen.dart';
+
+
+
 import '../../Views/TourStation/tour_station_view.dart';
+import '../../screen/Search/Search_Screen.dart';
+
 
 
 
@@ -52,9 +61,9 @@ class AppCubit extends Cubit<AppStates>
   //////toggle between page Home_Screen_body/////
 
   List<Widget>homeScreen=[
-    // const MapScreen(),
+    const UserMap(),
      SearchScreen(),
-     TourStationView(),
+    const TourStationScreen(),
     const SettingScreen(),
   ];
   int currentHomeIndex=1;

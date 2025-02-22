@@ -1,53 +1,57 @@
-
-
-
-
-
-
-
-
-
-
 import 'package:flutter/material.dart';
 import 'package:grade_project/shared/styles/log_app.dart';
-
+import '../../layout/Home_Screen/home_screen.dart';
 import '../../screen/admin/admin_screen.dart';
-import '../../screen/admin/list_admin.dart';
+import '../../shared/components/components.dart';
+import '../Login_Screen/login_screen.dart';
 
 class AdminView extends StatelessWidget {
+  IconApp iconApp = IconApp();
 
-  IconApp iconApp=IconApp();
-
-   AdminView({super.key});
-
-
+  AdminView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-     return Scaffold(
+    return Scaffold(
       appBar: AppBar(
-              leading:Image(image:iconApp.adminIconImage()),
+        leading: Image(image: iconApp.adminIconImage()),
+        title: const Center(
+          child: Text(
+            "CTA bus service",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+        ),
+        actions:   [
+          IconButton(onPressed: () {
+            showDialog(context: context,
+              builder: (context) => AlertDialog(
+                title: const Text("للخروج من الصفحة "),
+                actions: [
+                  Column(
+                    children: [
+                      IconButton(onPressed: () {
+                        navigateStop(context,  HomeScreen());
+                      },
+                          icon: const Icon(Icons.home)),
+                      const Text("صفحة رئيسية")
+                    ],
+                  ),
+                ],
+                //importComponents.closeArrow(context,HomeScreen(),const LoginScreen())
 
-               title: const Center(child: Text("CTA bus service",),
-              ),
-               actions:  const [
+              ),);
+          },
+              icon: const Icon(Icons.arrow_forward_ios,color: Colors.white,)),
 
-               ],
-            ) ,
-     body:AdminScreen(),
-
-
-
+        ],
+      ),
+      body: const AdminScreen(),
 
 
     );
-
-
-
-
-
-
-
-
   }
 }

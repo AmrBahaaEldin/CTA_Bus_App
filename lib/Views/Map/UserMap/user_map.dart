@@ -1,41 +1,91 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-
-import 'package:grade_project/shared/styles/log_app.dart';
-import 'package:latlong2/latlong.dart';  // للتعامل مع النقاط والمسافات
-import 'package:geolocator/geolocator.dart';  // للحصول على الموقع المباشر
-import 'package:http/http.dart' as http;  // لإرسال طلبات HTTP
+import 'package:latlong2/latlong.dart'; // للتعامل مع النقاط والمسافات
+import 'package:geolocator/geolocator.dart'; // للحصول على الموقع المباشر
+import 'package:http/http.dart' as http; // لإرسال طلبات HTTP
 import 'dart:convert';
 
-class RouteWithLiveLocationMap extends StatefulWidget {
+import '../../../data/web_server/connect_app_api.dart';
+
+class UserMap extends StatefulWidget {
+  const UserMap({super.key});
+
   @override
-  _RouteWithLiveLocationMapState createState() => _RouteWithLiveLocationMapState();
+  _UserMapState createState() => _UserMapState();
 }
 
-class _RouteWithLiveLocationMapState extends State<RouteWithLiveLocationMap> {
-  LatLng? liveLocation;  // الموقع المباشر
-  LatLng? userSelectedLocation;  // الموقع الذي يختاره المستخدم
-  List<LatLng> routeCoordinates = [];  // نقاط المسار بين النقطتين
+class _UserMapState extends State<UserMap> {
+  late WebServices webServices;
+  List<dynamic> _stations = [];
+  List<Marker> _markers = [];
+  LatLng? liveLocation; // الموقع المباشر
+  LatLng? userSelectedLocation; // الموقع الذي يختاره المستخدم
+  List<LatLng> routeCoordinates = []; // نقاط المسار بين النقطتين
   String distanceText = '';
   late MapController _mapController;
-  IconApp iconApp=IconApp();
-  // قائمة تحتوي على العلامات الثابتة
-  final List<LatLng> fixedMarkers = [
-    const LatLng(29.993228591871922, 31.312598656897627),  // مثال: مبنى إمباير ستيت
-    const LatLng(29.982048263044135, 31.34711808698053),  // مثال: تمثال الحرية
-    const LatLng(29.976922650709948, 31.349119534633264),  // مثال: ميدان التايمز
-    const LatLng(29.980926771921478, 31.314127038985955),  // مثال: مانهاتن
-    const LatLng(29.95966078496634, 31.258560398395222),  // مثال: بروكلين
-    const LatLng(29.998878868035085, 31.207448224703036),  // مثال: جسر بروكلين
-    const LatLng(30.024121114614594, 31.276262228674128),  // مثال: سنترال بارك
-  ];// للتحكم بالكاميرا// لعرض المسافة المحسوبة بين النقطتين
 
   @override
   void initState() {
     super.initState();
-    _mapController = MapController();  // تهيئة MapController
-    _checkPermissionsAndGetLocation();  // تحقق من أذونات الموقع واحصل على الموقع المباشر
+    webServices = WebServices();
+    _mapController = MapController(); // تهيئة MapController
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    // عرض النقاط أولاً
+    await _fetchStations();
+    // ثم الحصول على الموقع
+    await _checkPermissionsAndGetLocation();
+  }
+
+  Future<void> _fetchStations() async {
+    try {
+      final stations = await webServices.getAllStations();
+      if (mounted) {
+        setState(() {
+          _stations = stations;
+          _markers = _stations.map((station) {
+            return Marker(
+              point: LatLng(
+                double.parse(station['latitude']),
+                double.parse(station['longitude']),
+              ),
+              width: 50,
+              height: 50,
+              child: Tooltip(
+                message: "اضغط هنا للحصول على معلومات",
+                child: GestureDetector(
+                  onTap: () {
+                    _showStationInfo(station['name']);
+                  },
+                  child: const Icon(
+                    Icons.location_on,
+                    color: Colors.orange,
+                    size: 40,
+                  ),
+                ),
+              ),
+            );
+          }).toList();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnackBarWithRetry("فشل في تحميل بيانات المحطات. يرجى التحقق من الاتصال بالشبكة.");
+      }
+    }
+  }
+
+  void _showStationInfo(String stationName) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Center(child: Text("محطة: $stationName",style: const TextStyle(fontWeight: FontWeight.bold),)),
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
   }
 
   Future<void> _checkPermissionsAndGetLocation() async {
@@ -43,107 +93,155 @@ class _RouteWithLiveLocationMapState extends State<RouteWithLiveLocationMap> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        _showSnackBar("GPS غير مفعل. يرجى تفعيله.");  // إظهار رسالة تنبيه  // إظهار رسالة تنبيه
+        if (mounted) {
+          _showSnackBarWithRetry("GPS غير مفعل. يرجى تفعيله.");
+        }
         return;
       }
-      Position position = await Geolocator.getCurrentPosition();
-      setState(() {
-        liveLocation = LatLng(position.latitude, position.longitude);
-        _mapController.move(liveLocation!, 18);
-      });// تحديث الموقع المباشر
     }
-
     if (!(await Geolocator.isLocationServiceEnabled())) {
-      _showSnackBar("GPS مغلق. يرجى تفعيله.");
+      if (mounted) {
+        _showSnackBarWithRetry("GPS مغلق. يرجى تفعيله.");
+      }
       return;
     }
 
-    Position position = await Geolocator.getCurrentPosition();
-    setState(() {
-      liveLocation = LatLng(position.latitude, position.longitude);// احصل على الموقع المباشر
-      _mapController.move(liveLocation!, 16);
-    });
+    try {
+      Position position = await Geolocator.getCurrentPosition();
+      if (mounted) {
+        setState(() {
+          liveLocation = LatLng(position.latitude, position.longitude); // احصل على الموقع المباشر
+          _mapController.move(liveLocation!, 20);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnackBarWithRetry("حدث خطأ في الحصول على الموقع. يرجى المحاولة مرة أخرى.");
+      }
+    }
   }
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 4),  // مدة عرض الرسالة
-      ),
+
+  void _showSnackBarWithRetry(String message) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(message),
+                ),
+                ElevatedButton(
+                  onPressed: _checkPermissionsAndGetLocation,
+                  child: const Text("محاولة"),
+                ),
+              ],
+            ),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    }
     );
   }
 
   Future<void> _getRoute() async {
     if (liveLocation == null || userSelectedLocation == null) {
-      _showSnackBar("الرجاء التأكد من تشغيل GPS قبل تحديد المسار.");
+      if (mounted) {
+        _showSnackBarWithRetry("الرجاء التأكد من تشغيل GPS قبل تحديد المسار.");
+      }
       return;
     }
 
-    final response = await http.get(
+    try {
+      final response = await http.get(
         Uri.parse(
-            'http://router.project-osrm.org/route/v1/driving/${liveLocation!.longitude},${liveLocation!.latitude};${userSelectedLocation!.longitude},${userSelectedLocation!.latitude}?overview=full&geometries=geojson'));
+            'http://router.project-osrm.org/route/v1/driving/${liveLocation!.longitude},${liveLocation!.latitude};${userSelectedLocation!.longitude},${userSelectedLocation!.latitude}?overview=full&geometries=geojson'),
+      );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
 
-      // الحصول على النقاط لرسم المسار الفعلي بين النقطتين
-      final List coordinates = data['routes'][0]['geometry']['coordinates'];
+        final List coordinates = data['routes'][0]['geometry']['coordinates'];
 
-      routeCoordinates = coordinates.map((c) {
-        return LatLng(c[1], c[0]);
-      }).toList();
+        routeCoordinates = coordinates.map((c) {
+          return LatLng(c[1], c[0]);
+        }).toList();
 
-      // حساب المسافة
-      const distanceCalculator =   Distance();
-      double distanceInMeters = distanceCalculator.as(
-          LengthUnit.Meter, liveLocation!, userSelectedLocation!);
-      distanceText = 'المسافة: ${distanceInMeters.toStringAsFixed(2)} متر';
+        const distanceCalculator = Distance();
+        double distanceInMeters = distanceCalculator.as(
+            LengthUnit.Meter, liveLocation!, userSelectedLocation!);
+        distanceText = 'المسافة: ${distanceInMeters.toStringAsFixed(2)} متر';
 
-      setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
+      } else {
+        if (mounted) {
+          _showSnackBarWithRetry("فشل في الحصول على المسار. يرجى التحقق من الاتصال بالشبكة.");
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnackBarWithRetry("حدث خطأ في الاتصال. يرجى التحقق من الاتصال بالشبكة.");
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      body: Column(
+      body: _markers.isEmpty
+          ? const Center(
+          child: CircularProgressIndicator(
+            color: Color(0xFF0057FF),
+          ))
+          : Column(
         children: [
-          Text(distanceText,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20)),  // لعرض المسافة بين النقطتين
+          Text(
+            distanceText,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
           Expanded(
             child: FlutterMap(
-              mapController: _mapController,  // استخدام MapController للتحكم بالكاميرا
-
+              mapController: _mapController,
               options: MapOptions(
-                initialCenter: liveLocation ?? const LatLng(0, 0),  // مركز الخريطة
-                initialZoom: 18,  // مستوى التقريب
-                onTap: (tapPosition, point) {
-                  setState(() async{
-                         if (!(await Geolocator.isLocationServiceEnabled())) {
-                           _showSnackBar("GPS مغلق. يرجى تفعيله.");
-                            return;
-                         }
+                initialCenter: liveLocation ?? const LatLng(0, 0),
+                initialZoom: 18,
+                onTap: (tapPosition, point) async {
+                  if (!(await Geolocator.isLocationServiceEnabled())) {
+                    if (mounted) {
+                      _showSnackBarWithRetry("GPS مغلق. يرجى تفعيله.");
+                    }
+                    return;
+                  }
 
-                          setState(() {
-                           userSelectedLocation = point;  // عند النقر على الخريطة
-                           _getRoute();  // احصل على المسار
-                         }
-                                  );
+                  userSelectedLocation = point;
+                  await _getRoute();
 
-
-    },
-                  );
+                  if (mounted) {
+                    setState(() {});
+                  }
                 },
               ),
               children: [
                 TileLayer(
                   urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  errorTileCallback: (tile, error, stackTrace) {
+                    if (mounted) {
+                      _showSnackBarWithRetry("حدث خطأ أثناء تحميل الخريطة. يرجى التحقق من الاتصال بالشبكة.");
+                    }
+                  },
                 ),
                 if (liveLocation != null)
                   MarkerLayer(
                     markers: [
                       Marker(
-                        point: liveLocation!,  // العلامة الحمراء (الموقع المباشر)
+                        point: liveLocation!,
                         width: 80,
                         height: 80,
                         child: const Icon(
@@ -158,7 +256,7 @@ class _RouteWithLiveLocationMapState extends State<RouteWithLiveLocationMap> {
                   MarkerLayer(
                     markers: [
                       Marker(
-                        point: userSelectedLocation!,  // العلامة الزرقاء (الموقع الذي يختاره المستخدم)
+                        point: userSelectedLocation!,
                         width: 80,
                         height: 80,
                         child: const Icon(
@@ -173,24 +271,14 @@ class _RouteWithLiveLocationMapState extends State<RouteWithLiveLocationMap> {
                   PolylineLayer(
                     polylines: [
                       Polyline(
-                        points: routeCoordinates,  // الخط بين النقطتين بناءً على الطرق الفعلية
+                        points: routeCoordinates,
                         color: Colors.blue,
                         strokeWidth: 4.0,
                       ),
                     ],
                   ),
                 MarkerLayer(
-                  markers: fixedMarkers.map((latLng) => Marker(
-                    point: latLng,
-                    width: 50,
-                    height: 50,
-                    child:  const Icon(
-                      Icons.location_on,
-                      color: Colors.orange,
-
-                      size: 50,
-                    ),
-                  )).toList(),
+                  markers: _markers,
                 ),
               ],
             ),

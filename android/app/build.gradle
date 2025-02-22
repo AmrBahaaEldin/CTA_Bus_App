@@ -24,10 +24,10 @@ if (flutterVersionName == null) {
 
 android {
   /*  defaultConfig {
-        minSdkVersion 20
+        minSdkVersion flutter.minSdkVersion
     }*/
     namespace "com.example.grade_project"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -52,7 +52,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        minSdkVersion 20
+        minSdkVersion 21
         multiDexEnabled true
 
 

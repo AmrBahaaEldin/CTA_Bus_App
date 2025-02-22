@@ -1,24 +1,24 @@
 
-
-
-
 // ignore_for_file: prefer_typing_uninitialized_variables
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:grade_project/generated/l10n.dart';
+import 'package:grade_project/Views/adminApp/admin_view.dart';
 import 'package:grade_project/layout/Home_Screen/home_screen.dart';
-
-import 'package:grade_project/shared/BlockobServer.dart';
+import 'package:grade_project/screen/admin/admin_screen.dart';
+import 'package:grade_project/screen/loading/loading_Screen.dart';
 import 'package:grade_project/shared/cubit/cubit.dart';
-import 'package:grade_project/shared/cubit/state.dart';
 import 'package:grade_project/shared/network/local/cache_helper.dart';
 import 'package:grade_project/shared/styles/themes.dart';
-
-
-
-
+import 'Views/Login_Screen/login_screen.dart';
+import 'Views/Map/UserMap/user_map.dart';
+import 'Views/detector/intro_work_detector_view.dart';
+import 'Views/driver/driver_view.dart';
+import 'generated/l10n.dart';
+import 'shared/BlockobServer.dart';
+import 'shared/cubit/state.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();//app not work before execute methods above runApp
@@ -32,7 +32,9 @@ class MyApp extends StatelessWidget {
  final  isDark;
  final selectedLanguage;
 
-   const MyApp(this.isDark,
+
+
+    const MyApp(this.isDark,
        this.selectedLanguage,
        {super.key});
 
@@ -41,6 +43,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    // وجهة معينة
      return    MultiBlocProvider(
          providers:[
        BlocProvider(create: (context) => AppCubit()
@@ -62,7 +65,8 @@ class MyApp extends StatelessWidget {
         return   MaterialApp(
 
 
-          locale: const Locale('ar'),
+
+          locale:  const Locale('ar'),
           ////////////language////////////////////
           localizationsDelegates: const [
                 S.delegate,
@@ -71,7 +75,7 @@ class MyApp extends StatelessWidget {
                 GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: S.delegate.supportedLocales,
-         
+
           ////////////////////////////////////////////////////////////////////////
           debugShowCheckedModeBanner: false,
           theme: lightTheme,
@@ -80,10 +84,12 @@ class MyApp extends StatelessWidget {
 
           themeMode:cubit.isDark ? ThemeMode.dark:ThemeMode.light,
 
-          home:   const HomeScreen(),
+
+          home:  const LoadingScreen(),
         );
            },
-             ));
+             ),
+     );
 
   }
 }

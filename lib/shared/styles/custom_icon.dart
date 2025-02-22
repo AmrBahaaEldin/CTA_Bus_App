@@ -15,8 +15,8 @@
 ///
 import 'package:flutter/widgets.dart';
 
-class MyFlutterApp {
-  MyFlutterApp._();
+class MyCustomIconApp {
+  MyCustomIconApp._();
 
   static const _kFontFam = 'MyFlutterApp';
   static const String? _kFontPkg = null;
@@ -26,4 +26,8 @@ class MyFlutterApp {
   static const IconData deskewingmap = IconData(0xe802, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData google_maps = IconData(0xe803, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData license_plate = IconData(0xe804, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData indonesia = IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData event = IconData(0xe804, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData license_plate_8154394 = IconData(0xe805, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData bus_stop_map = IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 //can back page
 void navigateTo(context,widget)=>Navigator.push(context,
     MaterialPageRoute(builder: (context) => widget));
-void navigateBack(context)=>Navigator.pop(context);
+void navigateBack(context, bool bool)=>Navigator.pop(context);
 //can't back page
 void navigateStop(context,widget)=>Navigator.pushAndRemoveUntil(context,
     MaterialPageRoute(
@@ -58,7 +58,8 @@ Widget fieldButton({
   Function()?suffixPressed,
   Function()? tap,
 
-  required String label,})=>
+  required String label,
+  AutovalidateMode ?autoValidateMode,})=>
     TextFormField(
   onChanged:onchange,
   onFieldSubmitted: onSubmit,
@@ -90,7 +91,9 @@ Widget defaultButton({
   width: width,
 
 
+
   child: MaterialButton(
+    color: Colors.blue,
     onPressed:pressed,
     height: height,
 
